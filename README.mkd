@@ -1,0 +1,80 @@
+myrurema
+========
+
+myrurema は、Rubyの次世代日本語版リファレンスである
+「Rubyリファレンスマニュアル刷新計画」(通称るりま) のリファレンスを
+手軽に参照するためのツールです。
+
+インストール
+------------
+
+Ruby >= 1.8.xと、Subversionが必要です。
+
+RubyGemsでインストールします。
+
+    $ sudo gem install myrurema
+
+するとruremaコマンドが使えるようになります。
+
+    $ rurema
+    (ヘルプが表示される)
+
+使い方
+------
+
+順を追って説明します。
+
+### 初期化
+
+まず、リファレンスのデータをダウンロードする必要があります。
+
+    $ rurema --init
+
+のようにすると、~/.rurema/以下にbitclustとdoctreeをダウンロードし、
+新しくデータベースを作成します。
+(データベースの作成には数分かかります。)
+
+別のディレクトリにインストールしたい場合はruremadirオプションを指定します。
+
+    $ rurema --init --ruremadir=/some/where
+
+### データベースについて
+
+bitclustは、Rubyの各バージョンに合わせたデータベースを
+作成するようになっています。デフォルトでは、お使いのRubyと
+同じバージョンのデータベースを生成します。
+
+別のRubyバージョン用のリファレンスデータベースを作成するには、
+rubyverオプションを指定します。
+
+    $ rurema --init --rubyver=1.9.2
+
+### リファレンスを引く
+
+ruremaコマンドにメソッド名やクラス名を与えると、リファレンスを表示します。
+
+    $ rurema Array#index
+
+### データベースの更新
+
+Rubyリファレンス刷新計画では、最新のRubyに完全対応したリファレンスを目指し、
+日夜更新が続いています。最新のリファレンスデータに更新するには、
+--updateコマンドを使います。
+
+    $ rurema --update
+
+この場合もruremadirオプション、rubyverオプションが指定可能です。
+
+その他
+------
+
+ライセンスはbitclustのものに準じます。
+
+  * [Rubyリファレンスマニュアル刷新計画](http://redmine.ruby-lang.org/projects/show/rurema)
+  * [ソースコード(github)](http://github.com/yhara/myrurema)
+
+myruremaはいまのところyharaが個人的に作成しています。
+
+yhara (Yutaka HARA)
+http://route477.net/
+yutaka.hara.gmail.com

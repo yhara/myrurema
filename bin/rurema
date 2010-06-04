@@ -1,0 +1,140 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'pathname'
+
+class Pathname; alias / +; end
+
+class Options
+  def initialize(argv)
+    @dry_run = false
+    @ruremadir = Pathname("~/.rurema").expand_path
+    @rubyver = RUBY_VERSION
+    @command = nil
+    @query = ""
+
+    @optionparser = OptionParser.new{|o|
+      o.on("--init",
+           "initialize rurema"){
+        @command = :init
+      }
+      o.on("--update",
+           "update documents and database"){
+        @command = :update
+      }
+
+      o.on("--dry-run",
+           "show commands only"){
+        @dry_run = true 
+      }
+      o.on("--ruremadir=PATH",
+           "specify rurema directory (default: #{@ruremadir})"){|path|
+        @ruremadir = Pathname(path)
+      }
+      o.on("--rubyver=STR",
+           "specify Ruby version (default: #{@rubyver})"){|str|
+        @rubyver = str
+      }
+      o.on("--help",
+           "show this message"){
+        puts o
+        exit
+      }
+    }
+    @query = @optionparser.parse(argv).join(" ")
+  end
+  attr_reader :dry_run, :ruremadir, :rubyver
+  attr_reader :command, :query
+
+  def usage
+    puts @optionparser
+  end
+end
+
+class Rurema
+  SVN_URL = "http://jp.rubyist.net/svn/rurema" 
+
+  def initialize(opt=Options.new(ARGV))
+    @opt = opt
+  end
+
+  def run
+    if @opt.command
+      send(@opt.command)
+    elsif @opt.query.empty?
+      @opt.usage
+    else
+      search(@opt.query, @opt.rubyver)
+    end
+  end
+
+  def init
+    sh "svn co -rHEAD #{SVN_URL}/doctree/trunk #{doctree_path}"
+    sh "svn co -rHEAD #{SVN_URL}/bitclust/trunk #{bitclust_path}"
+    init_db(@opt.rubyver)
+  end
+
+  def update
+    sh "svn up #{doctree_path}"
+    refresh_db(@opt.rubyver)
+  end
+
+  def search(query, ver)
+    unless has_db?(ver)
+      puts "You don't have a database for ruby #{ver}."
+      puts "Make it now? [y/n]"
+      if $stdin.gets.chomp.downcase == "y"
+        init_db(ver)
+      else
+        exit
+      end
+    end
+
+    sh "#{bitclust_path/'bin/refe.rb'}" +
+          " #{query} -d #{db_path(ver)}", :silent => true
+  end
+
+  def server
+    # TODO
+  end
+  
+  private
+
+  def init_db(ver)
+    sh "#{bitclust_path/'bin/bitclust.rb'}" +
+          " -d #{db_path(ver)} init version=#{ver} encoding=euc-jp"
+
+    refresh_db(ver)
+  end
+
+  def refresh_db(ver)
+    puts "Updating Rurema database:"
+    puts "This will take a few minutes. Please be patient."
+    sh "#{bitclust_path/'bin/bitclust.rb'}" +
+          " -d #{db_path(ver)}" +
+          " update --stdlibtree=#{doctree_path/'refm/api/src'}"
+  end
+
+  def bitclust_path
+    @opt.ruremadir / "bitclust"
+  end
+
+  def doctree_path
+    @opt.ruremadir / "doctree"
+  end
+
+  def has_db?(ver)
+    db_path(ver).directory?
+  end
+
+  def db_path(ver)
+    raise ArgumentError, "malformed ver: #{ver}" unless ver =~ /\A\d.\d.\d\z/
+    @opt.ruremadir / "db" / ver
+  end
+
+  def sh(cmd, opt={})
+    puts cmd unless opt[:silent]
+    system cmd unless @opt.dry_run
+  end
+end
+
+Rurema.new.run
