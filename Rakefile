@@ -17,6 +17,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.homepage = "http://github.com/yhara/#{PROJECT_NAME}"
   gemspec.description = gemspec.summary
   gemspec.authors = ["Yutaka HARA"]
+  gemspec.executables = ["rurema"]
 end
 
 desc "install current source as a gem"
