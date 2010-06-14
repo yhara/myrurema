@@ -6,10 +6,11 @@ class Pathname; alias / +; end
 
 class Options
   def initialize(argv)
+    @command = nil
+    @open_browser = false
     @dry_run = false
     @ruremadir = Pathname("~/.rurema").expand_path
     @rubyver = RUBY_VERSION
-    @command = nil
     @query = ""
 
     @optionparser = OptionParser.new{|o|
@@ -21,7 +22,15 @@ class Options
            "update documents and database"){
         @command = :update
       }
+      o.on("--server",
+           "start web server"){
+        @command = :server 
+      }
 
+      o.on("--browser",
+           "open web browser (only meaningful with --server)"){
+        @open_browser = true 
+      }
       o.on("--dry-run",
            "show commands only"){
         @dry_run = true 
@@ -42,7 +51,7 @@ class Options
     }
     @query = @optionparser.parse(argv).join(" ")
   end
-  attr_reader :dry_run, :ruremadir, :rubyver
+  attr_reader :dry_run, :ruremadir, :rubyver, :open_browser
   attr_reader :command, :query
 
   def usage
@@ -90,11 +99,22 @@ class Rurema
     end
 
     sh "#{bitclust_path/'bin/refe.rb'}" +
-          " #{query} -d #{db_path(ver)}", :silent => true
+         " #{query} -d #{db_path(ver)}", :silent => true
   end
 
   def server
-    # TODO
+    th = Thread.new{
+      sh "#{bitclust_path/'standalone.rb'}" +
+           " --baseurl=http://localhost:9292" +
+           " --port=9292" +
+           " --database=#{db_path(@opt.rubyver)}" +
+           " --debug"
+    }
+    if @opt.open_browser
+      cmd = (/mswin/ =~ RUBY_PLATFORM) ? "start" : "open"
+      sh "#{cmd} http://localhost:9292/view/"
+    end
+    th.join
   end
   
   private
@@ -127,7 +147,6 @@ class Rurema
   end
 
   def db_path(ver)
-    raise ArgumentError, "malformed ver: #{ver}" unless ver =~ /\A\d.\d.\d\z/
     @opt.ruremadir / "db" / ver
   end
 
