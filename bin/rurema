@@ -55,6 +55,7 @@ class Options
       }
     }
     @query, @num = @optionparser.parse(argv)
+    @query = "" if @query.nil?
     @num = @num.to_i if @num
   end
   attr_reader :dry_run, :ruremadir, :rubyver, :open_browser
