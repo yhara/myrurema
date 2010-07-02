@@ -43,6 +43,11 @@ class Options
            "specify Ruby version (default: #{@rubyver})"){|str|
         @rubyver = str
       }
+      o.on("--version",
+           "show version of myrurema"){
+        puts MyRurema::VERSION
+        exit
+      }
       o.on("--help",
            "show this message"){
         puts o
@@ -60,7 +65,8 @@ class Options
   end
 end
 
-class Rurema
+class MyRurema
+  VERSION = File.read((Pathname(__FILE__).dirname/"../VERSION").expand_path)
   SVN_URL = "http://jp.rubyist.net/svn/rurema" 
 
   def initialize(opt=Options.new(ARGV))
@@ -182,4 +188,4 @@ class Rurema
   end
 end
 
-Rurema.new.run
+MyRurema.new.run
