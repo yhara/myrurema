@@ -49,10 +49,11 @@ class Options
         exit
       }
     }
-    @query = @optionparser.parse(argv).join(" ")
+    @query, @num = @optionparser.parse(argv)
+    @num = @num.to_i if @num
   end
   attr_reader :dry_run, :ruremadir, :rubyver, :open_browser
-  attr_reader :command, :query
+  attr_reader :command, :query, :num
 
   def usage
     puts @optionparser
@@ -67,10 +68,13 @@ class Rurema
   end
 
   def run
-    if @opt.command
+    case 
+    when @opt.command
       send(@opt.command)
-    elsif @opt.query.empty?
+    when @opt.query.empty?
       @opt.usage
+    when @opt.num
+      search_num(@opt.query, @opt.num, @opt.rubyver)
     else
       search(@opt.query, @opt.rubyver)
     end
@@ -88,18 +92,24 @@ class Rurema
   end
 
   def search(query, ver)
-    unless has_db?(ver)
-      puts "You don't have a database for ruby #{ver}."
-      puts "Make it now? [y/n]"
-      if $stdin.gets.chomp.downcase == "y"
-        init_db(ver)
-      else
-        exit
-      end
-    end
+    should_have_db(ver)
 
     sh "#{bitclust_path/'bin/refe.rb'}" +
          " #{query} -d #{db_path(ver)}", :silent => true
+  end
+
+  def search_num(query, num, ver)
+    should_have_db(ver)
+
+    result = `#{bitclust_path/'bin/refe.rb'} #{query} -d #{db_path(ver)}`
+    word = result.split[num-1]
+    if word
+      word.gsub!(/\.#/, ".")    # avoid multi-hit for a module function
+      puts "searching #{word}"
+      search(word, ver)
+    else
+      error "less than #{num} entries found"
+    end
   end
 
   def server
@@ -142,6 +152,18 @@ class Rurema
     @opt.ruremadir / "doctree"
   end
 
+  def should_have_db(ver)
+    unless has_db?(ver)
+      puts "You don't have a database for ruby #{ver}."
+      puts "Make it now? [y/n]"
+      if $stdin.gets.chomp.downcase == "y"
+        init_db(ver)
+      else
+        exit
+      end
+    end
+  end
+
   def has_db?(ver)
     db_path(ver).directory?
   end
@@ -153,6 +175,10 @@ class Rurema
   def sh(cmd, opt={})
     puts cmd unless opt[:silent]
     system cmd unless @opt.dry_run
+  end
+
+  def error(msg)
+    $stderr.puts msg
   end
 end
 
