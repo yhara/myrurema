@@ -129,6 +129,7 @@ class MyRurema
            " --debug"
     }
     if @opt.open_browser
+      sleep 1  # wait for the server to start
       cmd = (/mswin/ =~ RUBY_PLATFORM) ? "start" : "open"
       sh "#{cmd} http://localhost:9292/view/"
     end
