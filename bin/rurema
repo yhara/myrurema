@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'optparse'
 require 'pathname'
+require 'shellwords'
 
 class Pathname; alias / +; end
 
@@ -102,7 +103,7 @@ class MyRurema
     should_have_db(ver)
 
     sh "#{bitclust_path/'bin/refe.rb'}" +
-         " #{query} -d #{db_path(ver)}", :silent => true
+         " #{Shellwords.escape query} -d #{db_path(ver)}", :silent => true
   end
 
   def search_num(query, num, ver)
