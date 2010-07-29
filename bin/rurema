@@ -9,6 +9,7 @@ class Options
   def initialize(argv)
     @command = nil
     @open_browser = false
+    @port = nil
     @dry_run = false
     @ruremadir = Pathname("~/.rurema").expand_path
     @rubyver = RUBY_VERSION
@@ -28,6 +29,10 @@ class Options
         @command = :server 
       }
 
+      o.on("--port=N",
+           "port number of the web browser (only meaningful with --server)"){|n|
+        @port = n.to_i
+      }
       o.on("--browser",
            "open web browser (only meaningful with --server)"){
         @open_browser = true 
@@ -60,7 +65,7 @@ class Options
     @num = @num.to_i if @num
   end
   attr_reader :dry_run, :ruremadir, :rubyver, :open_browser
-  attr_reader :command, :query, :num
+  attr_reader :command, :query, :num, :port
 
   def usage
     puts @optionparser
@@ -121,22 +126,27 @@ class MyRurema
   end
 
   def server
+    port = @opt.port || default_port(@opt.rubyver)
     th = Thread.new{
       sh "#{bitclust_path/'standalone.rb'}" +
-           " --baseurl=http://localhost:9292" +
-           " --port=9292" +
+           " --baseurl=http://localhost:#{port}" +
+           " --port=#{port}" +
            " --database=#{db_path(@opt.rubyver)}" +
            " --debug"
     }
     if @opt.open_browser
       sleep 1  # wait for the server to start
       cmd = (/mswin/ =~ RUBY_PLATFORM) ? "start" : "open"
-      sh "#{cmd} http://localhost:9292/view/"
+      sh "#{cmd} http://localhost:#{port}/view/"
     end
     th.join
   end
   
   private
+
+  def default_port(ver)
+    "10" + ver.scan(/\d/).join
+  end
 
   def init_db(ver)
     sh "#{bitclust_path/'bin/bitclust.rb'}" +
