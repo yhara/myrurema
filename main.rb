@@ -2,12 +2,18 @@
 require 'pathname'
 require 'rubygems'
 require 'ruby-station'; RubyStation.parse_argv
-require 'bin/rurema'
+require File.expand_path("src/myrurema", File.dirname(__FILE__))
 
+opt = Options.new(ARGV)
 ruremadir = Pathname(RubyStation.data_dir)
+
 if ruremadir.entries.size == 2
-  args = ARGV + %w(--init --ruremadir=#{RubyStation.data_dir})
-  MyRurema.new(Options.new(args).run)
+  opt.command = :init
+  opt.ruremadir = RubyStation.data_dir
+  MyRurema.new(opt).run
 end
-args = ARGV + %w(--server --port=#{RubyStation.port} --ruremadir=#{RubyStation.data_dir})
-MyRurema.new(Options.new(args).run)
+
+opt.command = :server
+opt.ruremadir = RubyStation.data_dir
+opt.port = RubyStation.port
+MyRurema.new(opt).run
