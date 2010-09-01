@@ -87,8 +87,35 @@ Rubyリファレンス刷新計画では、最新のRubyに完全対応したリ
 
     $ rurema --update
 
+リファレンスの書き方
+====================
+
+myruremaは、リファレンスを書くための機能も少し備えています。
+
+リファレンスの原稿は、~/.rurema/doctree/refm/api/src/ 以下に置かれています。
+
+### プレビュー
+
+--previewオプションを指定すると、特定のメソッドをHTMLファイルにコンパイル
+します。
+
+    rurema --preview _builtin/Array Array#pop
+
+コンパイル結果は/tmp/rurema_preview.htmlに保存されます。
+--browserオプションを指定すると、コンパイル結果をブラウザで開きます。
+
+    rurema --preview _builtin/Array Array#pop --browser
+
+うまく書けたら、svn diffコマンドで差分を表示し、
+るりまの[Issue Tracker](http://redmine.ruby-lang.org/projects/rurema/issues)
+にチケットを作って、パッチを貼り付けてください。
+内容が問題なければ、るりまコミッターがコミットしてくれます。
+
+パッチがたくさん採用されれば、そのうちに、あなたもるりまコミッターの
+一員に勧誘されるでしょう。 :-)
+
 その他
-------
+======
 
 ライセンスはbitclustのものに準じます。
 

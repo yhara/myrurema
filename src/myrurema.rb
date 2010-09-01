@@ -1,6 +1,7 @@
 require 'optparse'
 require 'pathname'
 require 'shellwords'
+require 'tmpdir'
 
 class Pathname; alias / +; end
 
@@ -12,7 +13,6 @@ class Options
     @dry_run = false
     @ruremadir = Pathname("~/.rurema").expand_path
     @rubyver = RUBY_VERSION
-    @query = ""
 
     @optionparser = OptionParser.new{|o|
       o.on("--init",
@@ -27,13 +27,17 @@ class Options
            "start web server"){
         @command = :server 
       }
+      o.on("--preview",
+           "render a reference as HTML"){
+        @command = :preview 
+      }
 
       o.on("--port=N",
            "port number of the web browser (only meaningful with --server)"){|n|
         @port = n.to_i
       }
       o.on("--browser",
-           "open web browser (only meaningful with --server)"){
+           "open web browser (only meaningful with --server or --preview)"){
         @open_browser = true 
       }
       o.on("--dry-run",
@@ -59,12 +63,10 @@ class Options
         exit
       }
     }
-    @query, @num = @optionparser.parse(argv)
-    @query = "" if @query.nil?
-    @num = @num.to_i if @num
+    @rest_args = @optionparser.parse(argv)
   end
   attr_accessor :dry_run, :ruremadir, :rubyver, :open_browser
-  attr_accessor :command, :query, :num, :port
+  attr_accessor :command, :port, :rest_args
 
   def ruremadir=(dir)
     @ruremadir = Pathname(dir)
@@ -84,15 +86,18 @@ class MyRurema
   end
 
   def run
-    case 
-    when @opt.command
+    if @opt.command
       send(@opt.command)
-    when @opt.query.empty?
-      @opt.usage
-    when @opt.num
-      search_num(@opt.query, @opt.num, @opt.rubyver)
     else
-      search(@opt.query, @opt.rubyver)
+      query, num = *@opt.rest_args
+      case
+      when query && num
+        search_num(query, num.to_i, @opt.rubyver)
+      when query
+        search(query, @opt.rubyver)
+      else
+        @opt.usage
+      end
     end
   end
 
@@ -143,6 +148,26 @@ class MyRurema
       sh "#{cmd} http://localhost:#{port}/view/"
     end
     th.join
+  end
+
+  TMP_FILE = Pathname(Dir.tmpdir)/'rurema_preview.html'
+  def preview
+    file, target = *@opt.rest_args
+
+    unless File.exist?(file)
+      error "file not found: #{file}"
+    end
+
+    result = sh "#{bitclust_path/'tools/bc-tohtml.rb'}" +
+                  " #{file}" +
+                  (target ? " --target=#{target}" : "") +
+                  " --ruby=#{@opt.rubyver}" +
+                  " > #{TMP_FILE}"
+
+    if result && @opt.open_browser
+      cmd = (/mswin/ =~ RUBY_PLATFORM) ? "start" : "open"
+      sh "#{cmd} #{TMP_FILE}"
+    end
   end
   
   private
@@ -201,5 +226,6 @@ class MyRurema
 
   def error(msg)
     $stderr.puts msg
+    exit
   end
 end

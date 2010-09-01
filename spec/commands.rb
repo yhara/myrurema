@@ -45,6 +45,23 @@ CASES = {
     %r{standalone},
     %r{(start|open) http://localhost:}
   ],
+
+#  "rurema --edit" => [
+#    %r{cd .*doctree/refm/api/src},
+#  ],
+
+  "rurema --preview _builtin/Array" => [
+    %r{bc-tohtml.*_builtin/Array .*rurema_preview.html},
+  ],
+
+  "rurema --preview _builtin/Array Array#pop" => [
+    %r{bc-tohtml.*_builtin/Array --target=Array#pop.*rurema_preview.html},
+  ],
+
+  "rurema --preview Array --browser" => [
+    %r{bc-tohtml},
+    %r{(start|open) .*rurema_preview.html}
+  ],
 }
 
 describe MyRurema do
