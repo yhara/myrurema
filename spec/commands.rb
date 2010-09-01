@@ -6,6 +6,8 @@ class MyRurema
     @cmds << cmd
   end
   attr_reader :cmds
+
+  def exit; end
 end
 
 CASES = {
@@ -46,9 +48,9 @@ CASES = {
     %r{(start|open) http://localhost:}
   ],
 
-#  "rurema --edit" => [
-#    %r{cd .*doctree/refm/api/src},
-#  ],
+  "rurema --preview" => [
+    %r{cd .*doctree/refm/api/src},
+  ],
 
   "rurema --preview _builtin/Array" => [
     %r{bc-tohtml.*_builtin/Array .*rurema_preview.html},

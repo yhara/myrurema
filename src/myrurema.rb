@@ -32,6 +32,8 @@ class Options
         @command = :preview 
       }
 
+      o.on("----"){}
+
       o.on("--port=N",
            "port number of the web browser (only meaningful with --server)"){|n|
         @port = n.to_i
@@ -52,6 +54,9 @@ class Options
            "specify Ruby version (default: #{@rubyver})"){|str|
         @rubyver = str
       }
+
+      o.on("-----"){}
+
       o.on("--version",
            "show version of myrurema"){
         puts MyRurema::VERSION
@@ -154,19 +159,21 @@ class MyRurema
   def preview
     file, target = *@opt.rest_args
 
-    unless File.exist?(file)
-      error "file not found: #{file}"
-    end
+    if file
+      error "file not found: #{file}" unless File.exist?(file)
 
-    result = sh "#{bitclust_path/'tools/bc-tohtml.rb'}" +
-                  " #{file}" +
-                  (target ? " --target=#{target}" : "") +
-                  " --ruby=#{@opt.rubyver}" +
-                  " > #{TMP_FILE}"
+      result = sh "#{bitclust_path/'tools/bc-tohtml.rb'}" +
+                    " #{file}" +
+                    (target ? " --target=#{target}" : "") +
+                    " --ruby=#{@opt.rubyver}" +
+                    " > #{TMP_FILE}"
 
-    if result && @opt.open_browser
-      cmd = (/mswin/ =~ RUBY_PLATFORM) ? "start" : "open"
-      sh "#{cmd} #{TMP_FILE}"
+      if result && @opt.open_browser
+        cmd = (/mswin/ =~ RUBY_PLATFORM) ? "start" : "open"
+        sh "#{cmd} #{TMP_FILE}"
+      end
+    else
+      sh "cd #{doctree_path/'refm/api/src'}"
     end
   end
   
