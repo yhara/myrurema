@@ -1,3 +1,7 @@
-version 0.0.4
+2010-09-01 version 0.1.0
+
+  * new: --preview
+
+2010-09-01 version 0.0.4
 
   * can be installed by ruby-station (>= 0.1.6)
