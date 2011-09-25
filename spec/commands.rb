@@ -64,6 +64,9 @@ CASES = {
     %r{bc-tohtml},
     %r{(start|open) .*rurema_preview.html}
   ],
+  "rurema --list" => [
+    %r{refe.*-l},
+  ],
 }
 
 describe MyRurema do
