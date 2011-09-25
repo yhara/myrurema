@@ -31,6 +31,10 @@ class Options
            "render a reference as HTML"){
         @command = :preview 
       }
+      o.on("--list",
+           "list all classes"){
+        @command = :list 
+      }
 
       o.on("----"){}
 
@@ -136,6 +140,13 @@ class MyRurema
     else
       error "less than #{num} entries found"
     end
+  end
+
+  def list
+    should_have_db(@opt.rubyver)
+
+    sh "#{bitclust_path/'bin/refe.rb'}" +
+         " -l -d #{db_path(@opt.rubyver)}", :silent => true
   end
 
   def server
