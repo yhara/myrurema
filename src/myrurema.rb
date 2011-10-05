@@ -15,13 +15,16 @@ class Options
     @rubyver = RUBY_VERSION
 
     @optionparser = OptionParser.new{|o|
-      o.banner = "Usage: rurema [options] <method name or class name>"
+      o.banner = [
+        "Usage: rurema [options] <method name or class name>",
+      ].join("\n")
+
       o.on("--init",
-           "initialize/upgrade rurema system"){
+           "initialize rurema system"){
         @command = :init
       }
       o.on("--update",
-           "update documents and database only"){
+           "update documents and database"){
         @command = :update
       }
       o.on("--server",
@@ -37,7 +40,7 @@ class Options
         @command = :list 
       }
 
-      o.on("----"){}
+      o.on("---- (OPTIONS)"){}
 
       o.on("--port=N",
            "port number of the web browser (only meaningful with --server)"){|n|
@@ -60,7 +63,7 @@ class Options
         @rubyver = str
       }
 
-      o.on("-----"){}
+      o.on("----- (INFO)"){}
 
       o.on("--version",
            "show version of myrurema"){
