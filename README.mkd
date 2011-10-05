@@ -60,11 +60,15 @@ ruremaコマンドにメソッド名やクラス名を与えると、リファ�
 
 引数によっては、複数の候補が表示されることもあります。
 
-    $ rurema index
+    $ rurema each_w
+    (1)Enumerable#each_with_index (2)Enumerable#each_with_object
+    (3)Matrix#each_with_index (4)Prime::PseudoPrimeGenerator#each_with_index
+    which one? > 
 
-最後に数字を付けることで、指定した番号の候補を表示できます。
-
-    $ rurema index 1
+(バージョン0.2.0から、上のようにどれを表示するか聞いてくるように
+なりました。外部プログラムから呼び出す場合などは、--no-askを付けると
+従来通りの表示になります。この場合は、最後に数字を付けることで、
+指定した番号の候補を表示できます。(例：$ rurema each_w 3))
 
 ### ローカルWebサーバの起動
 

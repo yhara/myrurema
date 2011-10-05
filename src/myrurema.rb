@@ -11,6 +11,7 @@ class Options
     @open_browser = false
     @port = nil
     @dry_run = false
+    @no_ask = false
     @ruremadir = Pathname("~/.rurema").expand_path
     @rubyver = RUBY_VERSION
 
@@ -54,6 +55,10 @@ class Options
            "show commands only"){
         @dry_run = true 
       }
+      o.on("--no-ask",
+           "do not ask keyboard input"){
+        @no_ask = true 
+      }
       o.on("--ruremadir=PATH",
            "specify rurema directory (default: #{@ruremadir})"){|path|
         @ruremadir = Pathname(path)
@@ -78,8 +83,8 @@ class Options
     }
     @rest_args = @optionparser.parse(argv)
   end
-  attr_accessor :dry_run, :ruremadir, :rubyver, :open_browser
-  attr_accessor :command, :port, :rest_args
+  attr_accessor :dry_run, :no_ask, :ruremadir, :rubyver,
+                :open_browser, :command, :port, :rest_args
 
   def ruremadir=(dir)
     @ruremadir = Pathname(dir)
@@ -132,7 +137,8 @@ class MyRurema
             " #{Shellwords.escape query} -d #{db_path(ver)}"
     sh cmd, :silent => true do |txt|
       if txt.lines.count < 10 and
-         txt.lines.first(2).join =~ /#{query}.*#{query}/m
+         txt.lines.first(2).join =~ /#{query}.*#{query}/m and
+         !@opt.no_ask
 
         words = {}
         k = 0
@@ -144,10 +150,11 @@ class MyRurema
           }
         }
         print "which one? > "
-        n = $stdin.gets.chomp.to_i
+        line = $stdin.gets or (puts; exit)
+        n = line.to_i
+
         puts "searching #{words[n]}"
         puts
-
         search(words[n].sub(/\.#/, "."), ver)
       else
         puts txt
