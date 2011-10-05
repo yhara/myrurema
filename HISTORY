@@ -1,3 +1,8 @@
+2011-10-05 version 0.2.0
+
+  * new: ask which method to show if several methods are found
+  * new: --list
+
 2010-09-01 version 0.1.0
 
   * new: --preview
