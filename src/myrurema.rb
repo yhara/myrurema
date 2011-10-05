@@ -15,12 +15,13 @@ class Options
     @rubyver = RUBY_VERSION
 
     @optionparser = OptionParser.new{|o|
+      o.banner = "Usage: rurema [options] <method name or class name>"
       o.on("--init",
-           "initialize rurema"){
+           "initialize/upgrade rurema system"){
         @command = :init
       }
       o.on("--update",
-           "update documents and database"){
+           "update documents and database only"){
         @command = :update
       }
       o.on("--server",
@@ -124,8 +125,31 @@ class MyRurema
   def search(query, ver)
     should_have_db(ver)
 
-    sh "#{bitclust_path/'bin/refe.rb'}" +
-         " #{Shellwords.escape query} -d #{db_path(ver)}", :silent => true
+    cmd = "#{bitclust_path/'bin/refe.rb'}" +
+            " #{Shellwords.escape query} -d #{db_path(ver)}"
+    sh cmd, :silent => true do |txt|
+      if txt.lines.count < 10 and
+         txt.lines.first(2).join =~ /#{query}.*#{query}/m
+
+        words = {}
+        k = 0
+        puts txt.lines.map{|line|
+          line.gsub(/(\S+)/){|str|
+            k+=1
+            words[k] = str
+            "(#{k})#{str}"
+          }
+        }
+        print "which one? > "
+        n = $stdin.gets.chomp.to_i
+        puts "searching #{words[n]}"
+        puts
+
+        search(words[n].sub(/\.#/, "."), ver)
+      else
+        puts txt
+      end
+    end
   end
 
   def search_num(query, num, ver)
@@ -237,9 +261,15 @@ class MyRurema
     @opt.ruremadir / "db" / ver
   end
 
-  def sh(cmd, opt={})
+  def sh(cmd, opt={}, &block)
     puts cmd unless opt[:silent]
-    system cmd unless @opt.dry_run
+    return if @opt.dry_run
+
+    if block
+      block.call(`#{cmd}`)
+    else
+      system cmd
+    end
   end
 
   def error(msg)
