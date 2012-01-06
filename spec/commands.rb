@@ -1,5 +1,7 @@
 require File.expand_path("../src/myrurema", File.dirname(__FILE__))
 
+$MYRUREMA_TEST = true
+
 class MyRurema
   def sh(cmd, opt={})
     @cmds ||= []

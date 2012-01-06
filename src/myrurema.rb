@@ -283,7 +283,11 @@ class MyRurema
   end
 
   def error(msg)
-    $stderr.puts msg
+    $stderr.puts msg unless $MYRUREMA_TEST
     exit
+  end
+
+  def puts(str)
+    Kernel.puts(str) unless $MYRUREMA_TEST
   end
 end
