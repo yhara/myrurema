@@ -2,6 +2,7 @@ require 'optparse'
 require 'pathname'
 require 'shellwords'
 require 'tmpdir'
+require 'myrurema/version'
 
 class Pathname; alias / +; end
 
@@ -72,7 +73,7 @@ class Options
 
       o.on("--version",
            "show version of myrurema"){
-        puts MyRurema::VERSION
+        puts "myrurema version #{MyRurema::VERSION}"
         exit
       }
       o.on("--help",
@@ -96,7 +97,6 @@ class Options
 end
 
 class MyRurema
-  VERSION = File.read((Pathname(__FILE__).dirname/"../VERSION").expand_path)
   SVN_URL = "http://jp.rubyist.net/svn/rurema" 
 
   def initialize(opt=Options.new(ARGV))
