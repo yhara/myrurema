@@ -12,10 +12,10 @@ end
 
 CASES = {
   "rurema --init" => [
-    %r{svn co .*doctree},
-    %r{svn co .*bitclust},
-    %r{bitclust.*init},
-    %r{bitclust.*update},
+    %r{svn co -rHEAD .*/doctree/trunk .*},
+    %r{svn co -rHEAD .*/bitclust/trunk .*},
+    %r{.*/bin/bitclust -d .* init version=.* encoding=euc-jp},
+    %r{.*/bin/bitclust -d .* update --stdlibtree=.*/refm/api/src},
   ],
 
   "rurema --init --rubyver=1.8.7" => [

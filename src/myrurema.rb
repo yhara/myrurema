@@ -133,7 +133,7 @@ class MyRurema
   def search(query, ver)
     should_have_db(ver)
 
-    cmd = "#{bitclust_path/'bin/refe.rb'}" +
+    cmd = "#{bitclust_path/'bin/refe'}" +
             " #{Shellwords.escape query} -d #{db_path(ver)}"
     sh cmd, :silent => true do |txt|
       if txt.lines.count < 10 and
@@ -165,7 +165,7 @@ class MyRurema
   def search_num(query, num, ver)
     should_have_db(ver)
 
-    result = `#{bitclust_path/'bin/refe.rb'} #{query} -d #{db_path(ver)}`
+    result = `#{bitclust_path/'bin/refe'} #{query} -d #{db_path(ver)}`
     word = result.split[num-1]
     if word
       word.gsub!(/\.#/, ".")    # avoid multi-hit for a module function
@@ -179,7 +179,7 @@ class MyRurema
   def list
     should_have_db(@opt.rubyver)
 
-    sh "#{bitclust_path/'bin/refe.rb'}" +
+    sh "#{bitclust_path/'bin/refe'}" +
          " -l -d #{db_path(@opt.rubyver)}", :silent => true
   end
 
@@ -229,7 +229,7 @@ class MyRurema
   end
 
   def init_db(ver)
-    sh "#{bitclust_path/'bin/bitclust.rb'}" +
+    sh "#{bitclust_path/'bin/bitclust'}" +
           " -d #{db_path(ver)} init version=#{ver} encoding=euc-jp"
 
     refresh_db(ver)
@@ -238,7 +238,7 @@ class MyRurema
   def refresh_db(ver)
     puts "Updating Rurema database:"
     puts "This will take a few minutes. Please be patient."
-    sh "#{bitclust_path/'bin/bitclust.rb'}" +
+    sh "#{bitclust_path/'bin/bitclust'}" +
           " -d #{db_path(ver)}" +
           " update --stdlibtree=#{doctree_path/'refm/api/src'}"
   end
