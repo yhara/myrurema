@@ -202,7 +202,7 @@ class MyRurema
     exit
   end
 
-  def puts(str)
+  def puts(str="")
     Kernel.puts(str) unless $MYRUREMA_TEST
   end
 
