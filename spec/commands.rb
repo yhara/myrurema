@@ -37,7 +37,11 @@ CASES = {
   ],
 
   "rurema Array" => [
-    %r{refe.*Array},
+    %r{.*/refe Array -d .*}
+  ],
+
+  "rurema Ar i" => [
+    %r{.*/refe Ar i -d .*},
   ],
 
   "rurema --server" => [

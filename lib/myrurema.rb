@@ -24,14 +24,24 @@ class MyRurema
     if @opt.command
       send(@opt.command)
     else
-      query, num = *@opt.rest_args
-      case
+      query = @opt.rest_args
+      num = if !query.empty? and query.last =~ /\A\d+\z/
+              query.pop.to_i
+            else
+              nil
+            end
+      
+      case 
+      when query.empty?
+        if num
+          search(num, @opt.rubyver)
+        else
+          @opt.usage
+        end
       when query && num
-        search_num(query, num.to_i, @opt.rubyver)
-      when query
-        search(query, @opt.rubyver)
+        search_num(query, num, @opt.rubyver)
       else
-        @opt.usage
+        search(query, @opt.rubyver)
       end
     end
   end
@@ -47,11 +57,14 @@ class MyRurema
     refresh_db(@opt.rubyver)
   end
 
+  # - query: Array or String
+  # - ver: String
   def search(query, ver)
     should_have_db(ver)
 
+    args = Array(query).map{|s| Shellwords.escape s}.join(" ")
     cmd = "#{bitclust_path/'bin/refe'}" +
-            " #{Shellwords.escape query} -d #{db_path(ver)}"
+            " #{args} -d #{db_path(ver)}"
     sh cmd, :silent => true do |txt|
       if txt.lines.count < 10 and
          txt.lines.first(2).join =~ /#{query}.*#{query}/m and
