@@ -66,13 +66,15 @@ class MyRurema
     cmd = "#{bitclust_path/'bin/refe'}" +
             " #{args} -d #{db_path(ver)}"
     sh cmd, :silent => true do |txt|
-      if txt.lines.count < 10 and
-         txt.lines.first(2).join =~ /#{query}.*#{query}/m and
+      lines = txt.lines.to_a
+      if lines.count < 10 and
+         lines.first(2).join =~ /#{query}.*#{query}/m and
+         lines[1] !~ /^--- / and   # ad hoc :-(  see Issue #2
          !@opt.no_ask
 
         words = {}
         k = 0
-        puts txt.lines.map{|line|
+        puts lines.map{|line|
           line.gsub(/(\S+)/){|str|
             k+=1
             words[k] = str
