@@ -1,4 +1,4 @@
-require File.expand_path("../src/myrurema", File.dirname(__FILE__))
+require File.expand_path("../lib/myrurema", File.dirname(__FILE__))
 
 $MYRUREMA_TEST = true
 
@@ -74,7 +74,7 @@ CASES = {
 describe MyRurema do
   it "should execute expected commands" do
     CASES.each do |command, expects|
-      opt = Options.new(command.split[1..-1])
+      opt = MyRurema::Options.new(command.split[1..-1])
       my = MyRurema.new(opt)
       my.run
 
