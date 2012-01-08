@@ -2,6 +2,7 @@ require File.expand_path("../lib/myrurema", File.dirname(__FILE__))
 
 $MYRUREMA_TEST = true
 
+# Override methods for testing
 class MyRurema
   def sh(cmd, opt={})
     @cmds ||= []
@@ -11,6 +12,8 @@ class MyRurema
 
   def exit; end
 end
+
+module Launchy; def self.open(*args); end; end
 
 CASES = {
   "rurema --init" => [
@@ -38,16 +41,16 @@ CASES = {
   ],
 
   "rurema --server" => [
-    %r{standalone},
+    %r{.*/standalone.rb --srcdir=.* --baseurl=http://localhost:.* --port=.* --database=.* --debug}
   ],
 
   "rurema --server --port=9898" => [
-    %r{standalone.*--port=9898},
+    %r{.*/standalone.rb --srcdir=.* --baseurl=http://localhost:.* --port=9898 --database=.* --debug}
   ],
 
   "rurema --server --browser" => [
-    %r{standalone},
-    %r{(start|open) http://localhost:}
+    %r{.*/standalone.rb --srcdir=.* --baseurl=http://localhost:.* --port=.* --database=.* --debug}
+    # Todo: Launchy.should_receive(:open)
   ],
 
   "rurema --preview" => [
@@ -72,20 +75,20 @@ CASES = {
 }
 
 describe MyRurema do
-  it "should execute expected commands" do
-    CASES.each do |command, expects|
-      opt = MyRurema::Options.new(command.split[1..-1])
+  CASES.each do |command, expects|
+    it "should respond to #{command}" do
+      opt = MyRurema::Options.new(command.split.drop(1))
       my = MyRurema.new(opt)
       my.run
 
       cmds = my.cmds
       i = 0
       expects.each do |pattern|
-        pattern.should satisfy{
-          i = cmds[i..-1].index{|cmd| pattern =~ cmd}
-          not i.nil?
+        cmds[i..-1].should satisfy{|ary|
+          ary.any?{|s| pattern =~ s}
         }
-        i += 1
+
+        i = cmds[i..-1].index{|cmd| pattern =~ cmd} + 1
       end
     end
   end

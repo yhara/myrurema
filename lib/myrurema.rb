@@ -2,6 +2,8 @@ require 'optparse'
 require 'pathname'
 require 'shellwords'
 require 'tmpdir'
+
+require 'launchy'
 require 'myrurema/options'
 require 'myrurema/version'
 
@@ -102,16 +104,23 @@ class MyRurema
     port = @opt.port || default_port(@opt.rubyver)
     th = Thread.new{
       sh "#{bitclust_path/'standalone.rb'}" +
+           " --srcdir=#{bitclust_path}" +
            " --baseurl=http://localhost:#{port}" +
            " --port=#{port}" +
            " --database=#{db_path(@opt.rubyver)}" +
-           " --debug"
+           " --debug" # needed to avoid the server running as daemon :-(
     }
+
+    url = "http://localhost:#{port}/view/"
+    puts "Starting BitClust server .."
+    puts "Open #{url} in your browser."
+    puts
+
     if @opt.open_browser
       sleep 1  # wait for the server to start
-      cmd = (/mswin/ =~ RUBY_PLATFORM) ? "start" : "open"
-      sh "#{cmd} http://localhost:#{port}/view/"
+      Launchy.open(url)
     end
+
     th.join
   end
 
