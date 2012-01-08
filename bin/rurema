@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
-require File.expand_path("../lib/myrurema", File.dirname(__FILE__))
+$LOAD_PATH.unshift File.expand_path("../lib", File.dirname(__FILE__))
+require 'myrurema'
 
 MyRurema.new.run
