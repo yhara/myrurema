@@ -118,7 +118,7 @@ class MyRurema
   def server
     port = @opt.port || default_port(@opt.rubyver)
     th = Thread.new{
-      sh "#{bitclust_path/'standalone.rb'}" +
+      sh "ruby #{bitclust_path/'standalone.rb'}" +
            " --srcdir=#{bitclust_path}" +
            " --baseurl=http://localhost:#{port}" +
            " --port=#{port}" +
