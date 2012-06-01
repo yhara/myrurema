@@ -170,7 +170,7 @@ class MyRurema
   def init_db(ver)
     sh "ruby -I #{bitclust_path/'lib'}" +
           " #{bitclust_path/'bin/bitclust'}" +
-          " -d #{db_path(ver)} init version=#{ver} encoding=euc-jp"
+          " -d #{db_path(ver)} init version=#{ver} encoding=utf-8"
 
     refresh_db(ver)
   end
