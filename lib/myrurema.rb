@@ -168,7 +168,8 @@ class MyRurema
   end
 
   def init_db(ver)
-    sh "#{bitclust_path/'bin/bitclust'}" +
+    sh "ruby -I #{bitclust_path/'lib'}" +
+          " #{bitclust_path/'bin/bitclust'}" +
           " -d #{db_path(ver)} init version=#{ver} encoding=euc-jp"
 
     refresh_db(ver)
@@ -177,7 +178,8 @@ class MyRurema
   def refresh_db(ver)
     puts "Updating Rurema database:"
     puts "This will take a few minutes. Please be patient."
-    sh "#{bitclust_path/'bin/bitclust'}" +
+    sh "ruby -I #{bitclust_path/'lib'}" +
+          " #{bitclust_path/'bin/bitclust'}" +
           " -d #{db_path(ver)}" +
           " update --stdlibtree=#{doctree_path/'refm/api/src'}"
   end
