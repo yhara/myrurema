@@ -14,6 +14,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = MyRurema::VERSION
 
-  gem.add_dependency("launchy", "~> 2.0.5")
+  gem.add_dependency("launchy", "~> 2.1")
   gem.add_development_dependency("rspec", ">= 2.0")
 end
