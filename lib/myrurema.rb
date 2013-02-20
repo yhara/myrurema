@@ -7,14 +7,14 @@ require 'launchy'
 require 'myrurema/options'
 require 'myrurema/version'
 
-# Extend Pathname so that you can write 
+# Extend Pathname so that you can write
 #   foo / "bar"    #=> Pathname("foo/bar")
 # instead of
 #   foo + "bar"
 class Pathname; alias / +; end
 
 class MyRurema
-  SVN_URL = "http://jp.rubyist.net/svn/rurema" 
+  SVN_URL = "http://jp.rubyist.net/svn/rurema"
 
   def initialize(opt=Options.new(ARGV))
     @opt = opt
@@ -30,8 +30,8 @@ class MyRurema
             else
               nil
             end
-      
-      case 
+
+      case
       when query.empty?
         if num
           search(num, @opt.rubyver)
@@ -67,11 +67,7 @@ class MyRurema
             " #{args} -d #{db_path(ver)}"
     sh cmd, :silent => true do |txt|
       lines = txt.lines.to_a
-      if lines.count < 10 and
-         lines.first(2).join =~ /#{query}.*#{query}/m and
-         lines[1] !~ /^--- / and   # ad hoc :-(  see Issue #2
-         !@opt.no_ask
-
+      if response_is_candidate_list(lines, query)
         words = {}
         k = 0
         puts lines.map{|line|
@@ -160,8 +156,21 @@ class MyRurema
       sh "cd #{doctree_path/'refm/api/src'}"
     end
   end
-  
+
   private
+
+  def response_is_candidate_list(lines, query)
+    return false if @opt.no_ask
+
+    return false if lines.count >= 10 || lines[1] =~ /^--- / # ad hoc :-(  see Issue #2
+
+    # if first several words are results of AND search
+    lines.first(2).join.split(/\s+/).all? do |word|
+      query.all? do |q|
+        word.include?(q)
+      end
+    end
+  end
 
   def default_port(ver)
     "10" + ver.scan(/\d/).join
