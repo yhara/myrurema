@@ -167,7 +167,7 @@ class MyRurema
     # if first several words are results of AND search
     lines.first(2).join.split(/\s+/).all? do |word|
       query.all? do |q|
-        word.include?(q)
+        word =~ Regexp.new(q, 'i')
       end
     end
   end
