@@ -67,7 +67,7 @@ class MyRurema
             " #{args} -d #{db_path(ver)}"
     sh cmd, :silent => true do |txt|
       lines = txt.lines.to_a
-      if response_is_candidate_list(lines, query)
+      if candidate_list_responded?(lines, query)
         words = {}
         k = 0
         puts lines.map{|line|
@@ -159,10 +159,8 @@ class MyRurema
 
   private
 
-  def response_is_candidate_list(lines, query)
+  def candidate_list_responded?(lines, query)
     return false if @opt.no_ask
-
-    return false if lines.count >= 10 || lines[1] =~ /^--- / # ad hoc :-(  see Issue #2
 
     # if first several words are results of AND search
     lines.first(2).join.split(/\s+/).all? do |word|
