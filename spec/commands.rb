@@ -19,16 +19,22 @@ CASES = {
   "rurema --init" => [
     %r{svn co -rHEAD .*/doctree/trunk .*},
     %r{svn co -rHEAD .*/bitclust/trunk .*},
-    %r{.*/bin/bitclust -d .* init version=.* encoding=euc-jp},
+    %r{.*/bin/bitclust -d .* init version=.* encoding=utf-8},
     %r{.*/bin/bitclust -d .* update --stdlibtree=.*/refm/api/src},
   ],
 
   "rurema --init --rubyver=1.8.7" => [
-    %r{bitclust.*init version=1.8.7}
+    %r{.},
+    %r{.},
+    %r{bitclust.*init version=1.8.7},
+    %r{.},
   ],
 
   "rurema --init --ruremadir=/tmp" => [
-    %r{svn co .*/tmp}
+    %r{svn co .*/tmp},
+    %r{.},
+    %r{.},
+    %r{.},
   ],
 
   "rurema --update" => [
@@ -85,14 +91,9 @@ describe MyRurema do
       my = MyRurema.new(opt)
       my.run
 
-      cmds = my.cmds
-      i = 0
-      expects.each do |pattern|
-        cmds[i..-1].should satisfy{|ary|
-          ary.any?{|s| pattern =~ s}
-        }
-
-        i = cmds[i..-1].index{|cmd| pattern =~ cmd} + 1
+      # Get commands executed with `sh()`
+      my.cmds.zip(expects).each do |cmd, pattern|
+        cmd.should match(pattern)
       end
     end
   end
