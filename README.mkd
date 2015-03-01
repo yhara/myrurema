@@ -8,7 +8,7 @@ myrurema は、Rubyの次世代日本語版リファレンスである
 インストール
 ------------
 
-Ruby >= 1.8.xと、Subversionが必要です。
+Ruby >= 1.8.xと、Gitが必要です。
 
 RubyGemsでインストールします。
 
@@ -121,10 +121,8 @@ myruremaは、リファレンスを書くための機能も少し備えていま
 
     rurema --preview _builtin/Array Array#pop --browser
 
-うまく書けたら、svn diffコマンドで差分を表示し、
-るりまの[Issue Tracker](http://redmine.ruby-lang.org/projects/rurema/issues)
-にチケットを作って、パッチを貼り付けてください。
-内容が問題なければ、るりまコミッターがコミットしてくれます。
+うまく書けたら、GitHubの[rurema/doctree](https://github.com/rurema/doctree)に
+プルリクエストしてください。内容が問題なければ、るりまコミッターがマージしてくれます。
 
 パッチがたくさん採用されれば、そのうちに、あなたもるりまコミッターの
 一員に勧誘されるでしょう。 :-)

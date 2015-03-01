@@ -14,7 +14,7 @@ require 'myrurema/version'
 class Pathname; alias / +; end
 
 class MyRurema
-  SVN_URL = "http://jp.rubyist.net/svn/rurema"
+  GIT_URL = "https://github.com/rurema"
 
   def initialize(opt=Options.new(ARGV))
     @opt = opt
@@ -47,13 +47,15 @@ class MyRurema
   end
 
   def init
-    sh "svn co -rHEAD #{SVN_URL}/doctree/trunk #{doctree_path}"
-    sh "svn co -rHEAD #{SVN_URL}/bitclust/trunk #{bitclust_path}"
+    sh "git clone #{GIT_URL}/doctree.git #{doctree_path}"
+    sh "git clone #{GIT_URL}/bitclust.git #{bitclust_path}"
     init_db(@opt.rubyver)
   end
 
   def update
-    sh "svn up #{doctree_path}"
+    Dir.chdir(doctree_path) do
+      sh "git pull"
+    end
     refresh_db(@opt.rubyver)
   end
 
