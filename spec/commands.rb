@@ -17,8 +17,8 @@ module Launchy; def self.open(*args); end; end
 
 CASES = {
   "rurema --init" => [
-    %r{svn co -rHEAD .*/doctree/trunk .*},
-    %r{svn co -rHEAD .*/bitclust/trunk .*},
+    %r{git clone .*/doctree\.git .*},
+    %r{git clone .*/bitclust\.git .*},
     %r{.*/bin/bitclust -d .* init version=.* encoding=utf-8},
     %r{.*/bin/bitclust -d .* update --stdlibtree=.*/refm/api/src},
   ],
@@ -31,14 +31,14 @@ CASES = {
   ],
 
   "rurema --init --ruremadir=/tmp" => [
-    %r{svn co .*/tmp},
+    %r{git clone .*/tmp},
     %r{.},
     %r{.},
     %r{.},
   ],
 
   "rurema --update" => [
-    %r{svn up},
+    %r{git pull},
     %r{bitclust.*update}
   ],
 
