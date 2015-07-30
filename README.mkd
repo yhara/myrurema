@@ -140,7 +140,7 @@ myruremaは、リファレンスを書くための機能も少し備えていま
 
 ライセンスはbitclustのものに準じます。
 
-  * [Rubyリファレンスマニュアル刷新計画](http://redmine.ruby-lang.org/projects/show/rurema)
+  * [Rubyリファレンスマニュアル刷新計画](https://github.com/rurema)
   * [ソースコード(github)](http://github.com/yhara/myrurema)
 
 myruremaはいまのところyharaが個人的に作成しています。
